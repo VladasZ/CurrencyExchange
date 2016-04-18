@@ -4,13 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CurrencyExchange
+namespace CurrencyExchange.Entities
 {
-    public static class DataSource
+    class Currency
     {
-        static DataSource()
-        {
-
-        }
+        public int Id { get; set; }
+        public string Name { get; set; }
     }
 }
