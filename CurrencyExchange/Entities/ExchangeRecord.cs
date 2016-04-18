@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CurrencyExchange.Entities
 {
-    class ExchangeRecord
+    public class ExchangeRecord
     {
         public int Id { get; set; }
         public Currency Currency { get; set; }

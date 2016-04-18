@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CurrencyExchange.Entities
 {
-    class CurrencyDbContext// : DbContext
+    public class CurrencyDbContext// : DbContext
     {
         public CurrencyDbContext()
         {
