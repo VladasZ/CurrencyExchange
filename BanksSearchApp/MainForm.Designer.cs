@@ -1,4 +1,4 @@
-﻿namespace Map
+﻿namespace BanksSearchApp
 {
     partial class MainForm
     {
@@ -28,12 +28,23 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
+            this.SuspendLayout();
+            // 
+            // MainForm
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Text = "Form1";
+            this.ClientSize = new System.Drawing.Size(930, 586);
+            this.Name = "MainForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Приложение";
+            this.ResumeLayout(false);
+
         }
 
         #endregion
+
+
     }
 }
 

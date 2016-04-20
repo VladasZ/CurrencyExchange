@@ -15,7 +15,6 @@ namespace CurrencyExchange.Entities
         }
 
         public DbSet<Bank> Banks { get; set; }
-        public DbSet<Currency> Currencies { get; set; }
         public DbSet<ExchangeRecord> ExchangeRecords { get; set; }
 
     }

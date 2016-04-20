@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using System.Data.Entity;
 
 namespace CurrencyExchange
 {
@@ -35,10 +36,16 @@ namespace CurrencyExchange
 
             IEnumerable<XElement> banks = doc.Element("banks").Elements();
 
-            int i = 0;
-
             foreach(XElement bank in banks)
             {
+                DbContext.ExchangeRecords.Add(
+                    new ExchangeRecord()
+                    {
+                        //Bank = (Bank)DbContext.Banks.Select(b => b.Id == int.Parse(bank.Element("idbank").Value)).FirstOrDefault()
+                    });
+
+                
+               
                 Console.WriteLine(" " + getBankName(bank.Element("idbank").Value) + " " +
                      bank.Element("usd").Element("sell").Value + " " + bank.Element("usd").Element("buy").Value) ;
             }
@@ -94,7 +101,6 @@ namespace CurrencyExchange
         {
             loadCurrencyData();
         }
-
 
     }
 }

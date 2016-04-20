@@ -9,10 +9,10 @@ namespace CurrencyExchange.Entities
     public class ExchangeRecord
     {
         public int Id { get; set; }
-        public Currency Currency { get; set; }
         public DateTime Date { get; set; }
         public Bank Bank { get; set; }
-        public double Sell { get; set; }
-        public double Buy { get; set; }
+        public Currency USD { get; set; }
+        public Currency EUR { get; set; }
+        public Currency RUR { get; set; }
     }
 }
