@@ -68,6 +68,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BankMark.cs" />
     <Compile Include="DataSource.cs" />
     <Compile Include="Entities\Bank.cs" />
     <Compile Include="Entities\Department.cs" />

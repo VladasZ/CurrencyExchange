@@ -146,6 +146,7 @@ namespace CurrencyExchange
 
     }
 
+    //нужен для строкового представления double с точкой как разделитель
     public static class DoubleExtensions
     {
         public static string ToGBString(this double value)
