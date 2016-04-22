@@ -6,10 +6,13 @@ using System.Threading.Tasks;
 
 namespace CurrencyExchange.Entities
 {
-    public class Bank
+    public class Department
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public List<Department> Departments { get; set; }
+        public int Address { get; set; }
+        public TimeSpan OpenTime { get; set; }
+        public TimeSpan CloseTime { get; set; }
+        public Bank Bank { get; set; }
     }
 }

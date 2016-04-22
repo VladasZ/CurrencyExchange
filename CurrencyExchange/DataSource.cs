@@ -7,6 +7,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Data.Entity;
+using System.Configuration;
+using GMap.NET;
+using System.Net;
+using Newtonsoft.Json;
+using System.Globalization;
 
 namespace CurrencyExchange
 {
@@ -29,6 +34,7 @@ namespace CurrencyExchange
         public static CurrencyDbContext DbContext { get; } = new CurrencyDbContext();
 
         private static string CurrencySourceXMLPath = @"http://www.obmennik.by/xml/kurs.xml";
+        private static string GoogleAPIKey = @"AIzaSyDo_63nP_vhZS53MftWlqoIhJX7bTToPA0";
 
         private static void loadCurrencyData()
         {
@@ -97,10 +103,54 @@ namespace CurrencyExchange
             }
         }
 
-        static void Main(string[] args)
+        public static string createGoogleApiRequest(PointLatLng userPosition, int radius, string bankName)
         {
-            loadCurrencyData();
+            return @"https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + userPosition.Lat + "," + userPosition.Lng +
+                    "&radius=" + radius +
+                    "&types=bank&name=" + bankName + 
+                    "&key=" + GoogleAPIKey;
         }
 
+        public static string createGoogleApiRequest(PointLatLng userPosition, int radius)
+        {
+            return @"https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" 
+                    + userPosition.Lat.ToGBString() + "," + userPosition.Lng.ToGBString() +
+                    "&radius=" + radius +
+                    "&types=bank&key=" + GoogleAPIKey;
+        }
+
+        public static GoogleAPIRootObject getData(PointLatLng userPosition, int radius)
+        {
+            string jsonData;
+
+            using (WebClient client = new WebClient())
+            {
+                client.Encoding = Encoding.UTF8;
+                jsonData = client.DownloadString(createGoogleApiRequest(userPosition, radius));
+            }
+
+            return JsonConvert.DeserializeObject<GoogleAPIRootObject>(jsonData);
+        }
+
+        static void Main(string[] args)
+        {
+           GoogleAPIRootObject rootObject = getData(new PointLatLng(53, 27), 50000);
+
+
+           foreach(Result result in rootObject.results)
+            {
+                Console.WriteLine(result.name);
+            }
+
+        }
+
+    }
+
+    public static class DoubleExtensions
+    {
+        public static string ToGBString(this double value)
+        {
+            return value.ToString(CultureInfo.GetCultureInfo("en-GB"));
+        }
     }
 }

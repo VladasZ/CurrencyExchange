@@ -1,4 +1,7 @@
-﻿using GMap.NET.WindowsForms;
+﻿using BanksSearchApp.Markers;
+using CurrencyExchange;
+using GMap.NET;
+using GMap.NET.WindowsForms;
 using GMap.NET.WindowsForms.Markers;
 using GMap.NET.WindowsForms.ToolTips;
 using System;
@@ -15,7 +18,21 @@ namespace BanksSearchApp
 {
     public partial class MainForm : Form
     {
+        enum OverlayType
+        {
+            UserLocationMarker,
+            BanksOverlay
+        }
+
+
         public GMapControl MapControl { get; } = new GMapControl();
+        public PointLatLng UserLocation
+        {
+            get
+            {
+                return getOverlay(OverlayType.UserLocationMarker).Markers.First().Position;
+            }
+        }
 
         public MainForm()
         {
@@ -35,18 +52,18 @@ namespace BanksSearchApp
             Controls.Add(MapControl);
 
             MapControl.MapProvider = GMap.NET.MapProviders.GMapProviders.OpenStreetMap;
-            GMap.NET.GMaps.Instance.Mode = GMap.NET.AccessMode.ServerAndCache;
+            GMaps.Instance.Mode = AccessMode.ServerAndCache;
 
             MapControl.Bearing = 0;
             MapControl.MaxZoom = 18;
-            MapControl.MinZoom = 11;
+            MapControl.MinZoom = 2;
             MapControl.Zoom = 15;
 
-            MapControl.MouseWheelZoomType = GMap.NET.MouseWheelZoomType.MousePositionAndCenter;
+            MapControl.MouseWheelZoomType = MouseWheelZoomType.MousePositionAndCenter;
 
             MapControl.CanDragMap = true;
 
-            MapControl.Position = new GMap.NET.PointLatLng(53.902800, 27.561759);
+            MapControl.Position = new PointLatLng(53.902800, 27.561759);
 
             MapControl.MarkersEnabled = true;
 
@@ -67,9 +84,7 @@ namespace BanksSearchApp
             if(e.Button == MouseButtons.Left)
             {
                 // удаляем предыдущую метку
-                GMapOverlay prevUserLocation = (from ov in MapControl.Overlays
-                                                where ov.Id == "UserLocationMarker"
-                                                select ov).FirstOrDefault();
+                GMapOverlay prevUserLocation = getOverlay(OverlayType.UserLocationMarker);
 
                 if (prevUserLocation != null)
                 {
@@ -77,21 +92,60 @@ namespace BanksSearchApp
                 }
 
 
-                double X = MapControl.FromLocalToLatLng(e.X, e.Y).Lng;
-                double Y = MapControl.FromLocalToLatLng(e.X, e.Y).Lat;
+                PointLatLng userLocation = MapControl.FromLocalToLatLng(e.X, e.Y);
+                Text = userLocation.ToString();
 
-                GMapOverlay markersOverlay = new GMapOverlay(MapControl, "UserLocationMarker");
+                GMapOverlay markersOverlay = new GMapOverlay(OverlayType.UserLocationMarker.ToString());
 
-                GMapMarkerGoogleRed markerG = new GMapMarkerGoogleRed
-                                               (new GMap.NET.PointLatLng(Y, X));
+                GMarkerGoogle markerG = new GMarkerGoogle(userLocation, GMarkerGoogleType.red);
+
+                Text += markerG.Position.ToString();
 
                 markerG.ToolTip = new GMapRoundedToolTip(markerG);
                 markerG.ToolTipText = "Вы";
-                markersOverlay.Markers.Add(markerG);
                 MapControl.Overlays.Add(markersOverlay);
+                markersOverlay.Markers.Add(markerG);
+
+                addMarks(DataSource.getData(userLocation, 1000));
             }
-           
+
         }
+
+        void addMarks(GoogleAPIRootObject rootObject)
+        {
+            //удаляем предыдущие марки
+
+            GMapOverlay prevBankMarks = getOverlay(OverlayType.BanksOverlay);
+
+            if (prevBankMarks != null)
+            {
+                MapControl.Overlays.Remove(prevBankMarks);
+            }
+
+            GMapOverlay banksOverlay = new GMapOverlay(OverlayType.BanksOverlay.ToString());
+            MapControl.Overlays.Add(banksOverlay);
+
+            foreach (Result result in rootObject.results)
+            {
+                GMarkerGoogle bankMarker = new GMarkerGoogle(result.Location, GMarkerGoogleType.arrow);
+                bankMarker.ToolTip = new GMapRoundedToolTip(bankMarker);
+                bankMarker.ToolTipText = result.name;
+                banksOverlay.Markers.Add(bankMarker);
+
+                
+            }
+
+        }
+
+
+        GMapOverlay getOverlay(OverlayType overlayType)
+        {
+            return (from ov in MapControl.Overlays
+                    where ov.Id == overlayType.ToString()
+                    select ov).FirstOrDefault();
+        }
+
+    }
        
     }
-}
+
