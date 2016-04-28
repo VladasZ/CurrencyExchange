@@ -69,18 +69,37 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BankMark.cs" />
+    <Compile Include="Database\DatabaseManager.cs" />
     <Compile Include="DataSource.cs" />
-    <Compile Include="Entities\Bank.cs" />
-    <Compile Include="Entities\Department.cs" />
-    <Compile Include="GoogleAPIClasses.cs" />
-    <Compile Include="Entities\Currency.cs" />
-    <Compile Include="CurrencyDbContext.cs" />
-    <Compile Include="Entities\ExchangeRecord.cs" />
+    <Compile Include="Database\Entities\Bank.cs" />
+    <Compile Include="Database\Entities\Department.cs" />
+    <Compile Include="Database\Entities\Currency.cs" />
+    <Compile Include="Database\CurrencyDbContext.cs" />
+    <Compile Include="Database\Entities\ExchangeRecord.cs" />
+    <Compile Include="GoogleAPI\PlaceId.cs" />
+    <Compile Include="GoogleAPI\PlaceInfo.cs" />
+    <Compile Include="Migrations\201604281351164_InitialCreate.cs" />
+    <Compile Include="Migrations\201604281351164_InitialCreate.Designer.cs">
+      <DependentUpon>201604281351164_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201604281522130_addObmennikId.cs" />
+    <Compile Include="Migrations\201604281522130_addObmennikId.Designer.cs">
+      <DependentUpon>201604281522130_addObmennikId.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201604281351164_InitialCreate.resx">
+      <DependentUpon>201604281351164_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201604281522130_addObmennikId.resx">
+      <DependentUpon>201604281522130_addObmennikId.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

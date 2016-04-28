@@ -106,12 +106,11 @@ namespace BanksSearchApp
                 MapControl.Overlays.Add(markersOverlay);
                 markersOverlay.Markers.Add(markerG);
 
-                addMarks(DataSource.getData(userLocation, 1000));
             }
 
         }
 
-        void addMarks(GoogleAPIRootObject rootObject)
+        void addMarks(List<BankMark> marks)
         {
             //удаляем предыдущие марки
 
@@ -125,15 +124,15 @@ namespace BanksSearchApp
             GMapOverlay banksOverlay = new GMapOverlay(OverlayType.BanksOverlay.ToString());
             MapControl.Overlays.Add(banksOverlay);
 
-            foreach (Result result in rootObject.results)
-            {
-                GMarkerGoogle bankMarker = new GMarkerGoogle(result.Location, GMarkerGoogleType.arrow);
-                bankMarker.ToolTip = new GMapRoundedToolTip(bankMarker);
-                bankMarker.ToolTipText = result.name;
-                banksOverlay.Markers.Add(bankMarker);
+            //foreach (Result result in rootObject.results)
+            //{
+            //    GMarkerGoogle bankMarker = new GMarkerGoogle(result.Location, GMarkerGoogleType.arrow);
+            //    bankMarker.ToolTip = new GMapRoundedToolTip(bankMarker);
+            //    bankMarker.ToolTipText = result.name;
+            //    banksOverlay.Markers.Add(bankMarker);
 
                 
-            }
+            //}
 
         }
 

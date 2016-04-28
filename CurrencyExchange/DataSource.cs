@@ -12,6 +12,7 @@ using GMap.NET;
 using System.Net;
 using Newtonsoft.Json;
 using System.Globalization;
+using CurrencyExchange.Database;
 
 namespace CurrencyExchange
 {
@@ -83,8 +84,8 @@ namespace CurrencyExchange
                 case 15: return "МТБанк";
                 case 16: return "Паритетбанк";
                 case 17: return "Приорбанк";
-                case 18: return "Сберегательный Банк Беларусбанк";
-                case 19: return "СОМБелБанк";
+                case 18: return "Беларусбанк";
+                case 19: return "Идея Банк";
                 case 20: return "Технобанк";
                 case 21: return "Хоум Кредит Банк";
                 case 22: return "Цептер Банк";
@@ -105,7 +106,7 @@ namespace CurrencyExchange
 
         public static string createGoogleApiRequest(PointLatLng userPosition, int radius, string bankName)
         {
-            return @"https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + userPosition.Lat + "," + userPosition.Lng +
+            return @"https://maps.googleapis.com/maps/api/place/radarsearch/json?location=" + userPosition.Lat + "," + userPosition.Lng +
                     "&radius=" + radius +
                     "&types=bank&name=" + bankName + 
                     "&key=" + GoogleAPIKey;
@@ -113,13 +114,13 @@ namespace CurrencyExchange
 
         public static string createGoogleApiRequest(PointLatLng userPosition, int radius)
         {
-            return @"https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" 
+            return @"https://maps.googleapis.com/maps/api/place/radarsearch/json?location="
                     + userPosition.Lat.ToGBString() + "," + userPosition.Lng.ToGBString() +
                     "&radius=" + radius +
                     "&types=bank&key=" + GoogleAPIKey;
         }
 
-        public static GoogleAPIRootObject getData(PointLatLng userPosition, int radius)
+        public static List<string> getPlacesID(PointLatLng userPosition, int radius)
         {
             string jsonData;
 
@@ -129,19 +130,74 @@ namespace CurrencyExchange
                 jsonData = client.DownloadString(createGoogleApiRequest(userPosition, radius));
             }
 
-            return JsonConvert.DeserializeObject<GoogleAPIRootObject>(jsonData);
+            PlaceIdRoot placeIdRoot = JsonConvert.DeserializeObject<PlaceIdRoot>(jsonData);
+
+            List<string> placesId = new List<string>();
+
+            foreach(PlaceIdResult id in placeIdRoot.results)
+            {
+                placesId.Add(id.place_id);
+            }
+
+            return placesId;
+        }
+
+        public static PlaceInfo getPlaceInfo(string placeID)
+        {
+            string jsonData;
+            string requestString = @"https://maps.googleapis.com/maps/api/place/details/json?placeid=" 
+                                    + placeID + "&key=" + GoogleAPIKey;
+
+
+            using (WebClient client = new WebClient())
+            {
+                client.Encoding = Encoding.UTF8;
+                jsonData = client.DownloadString(requestString);
+            }
+
+            PlaceInfo placeInfo = JsonConvert.DeserializeObject<PlaceInfo>(jsonData);
+
+            return placeInfo;
+        }
+
+        public static List<PlaceInfo> getPlacesInfo(List<string> placesId)
+        {
+            List<PlaceInfo> placesInfo = new List<PlaceInfo>();
+
+            foreach(string placeId in placesId)
+            {
+                placesInfo.Add(getPlaceInfo(placeId));
+            }
+
+            return placesInfo;
+        }
+
+        public static List<string> getDefaultPlacesId()
+        {
+            return getPlacesID(new PointLatLng(53.9017, 27.56227), 50000);
         }
 
         static void Main(string[] args)
         {
-           GoogleAPIRootObject rootObject = getData(new PointLatLng(53, 27), 50000);
+            // DatabaseManager.getData();
 
+            List<string> banks = (from bank in DatabaseManager.db.Departments
+                                  select bank.Name).Distinct().ToList();
 
-           foreach(Result result in rootObject.results)
+            List<string> banksNames = new List<string>();
+
+            foreach(string bank in banks)
             {
-                Console.WriteLine(result.name);
+                banksNames.Add(DatabaseManager.getBankName(bank));
             }
 
+            banksNames = (from name in banksNames
+                          select name).Distinct().ToList();
+
+            foreach(string name in banksNames)
+            {
+                Console.WriteLine(name);
+            }
         }
 
     }

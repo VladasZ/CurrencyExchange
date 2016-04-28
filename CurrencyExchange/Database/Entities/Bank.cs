@@ -9,7 +9,8 @@ namespace CurrencyExchange.Entities
     public class Bank
     {
         public int Id { get; set; }
+        public int ObmennikById { get; set; }
         public string Name { get; set; }
-        public List<Department> Departments { get; set; }
+        public List<BankDepartment> Departments { get; set; }
     }
 }
