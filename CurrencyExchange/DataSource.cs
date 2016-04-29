@@ -20,16 +20,7 @@ namespace CurrencyExchange
     {
         static DataSource()
         {
-            //DbContext.Currencies.AddRange(new List<Currency>() { new Currency() { Id = 0, Name = "USD" },
-            //                                                     new Currency() { Id = 1, Name = "EUR" },
-            //                                                     new Currency() { Id = 2, Name = "RUR" } });
-
-            //DbContext.Banks.AddRange(new List<Bank>() {  new Bank() { Id = 0,
-            //                                                          Name = "Идея Банк",
-            //                                                          Address = "г.Минск, ул. З.Бядули, д. 11",
-            //                                                          OpenTime = new TimeSpan(10, 00, 00),
-            //                                                          CloseTime = new TimeSpan(19, 00, 00) }});
-            
+            setObmennikByBankId();
         }
 
         public static CurrencyDbContext DbContext { get; } = new CurrencyDbContext();
@@ -37,73 +28,100 @@ namespace CurrencyExchange
         private static string CurrencySourceXMLPath = @"http://www.obmennik.by/xml/kurs.xml";
         private static string GoogleAPIKey = @"AIzaSyDo_63nP_vhZS53MftWlqoIhJX7bTToPA0";
 
-        private static void loadCurrencyData()
+        //айдишники банков для сайта obmennik.by
+        public static Dictionary<int, string> obmennikByBankId = new Dictionary<int, string>();
+
+        public static void loadCurrencyData()
         {
+            //данные о курсах достаю в ручную потому что мне не понравилась структура с сайта
             XDocument doc = XDocument.Load(CurrencySourceXMLPath);
 
             IEnumerable<XElement> banks = doc.Element("banks").Elements();
 
             foreach(XElement bank in banks)
             {
-                DbContext.ExchangeRecords.Add(
-                    new ExchangeRecord()
-                    {
-                        //Bank = (Bank)DbContext.Banks.Select(b => b.Id == int.Parse(bank.Element("idbank").Value)).FirstOrDefault()
-                    });
+                string bankName = obmennikByBankId[int.Parse(bank.Element("idbank").Value)];
 
-                
-               
-                Console.WriteLine(" " + getBankName(bank.Element("idbank").Value) + " " +
-                     bank.Element("usd").Element("sell").Value + " " + bank.Element("usd").Element("buy").Value) ;
+                Bank dbBank = DatabaseManager.findBank(bankName);
+
+                if (dbBank == null) continue;
+
+                Currency usd = new Currency()
+                {
+                    Buy = double.Parse(bank.Element("usd").Element("buy").Value),
+                    Sell = double.Parse(bank.Element("usd").Element("sell").Value)
+                };
+
+                Currency eur = new Currency()
+                {
+                    Buy = double.Parse(bank.Element("eur").Element("buy").Value),
+                    Sell = double.Parse(bank.Element("eur").Element("sell").Value)
+                };
+
+                Currency rur = new Currency()
+                {
+                    Buy = 5,//double.Parse(bank.Element("rur").Element("buy").Value, NumberStyles.AllowDecimalPoint),
+                    Sell = 5//double.Parse(bank.Element("rur").Element("sell").Value, NumberStyles.AllowDecimalPoint)
+                };
+
+                ExchangeRecord newRecord = DatabaseManager.findExchangeRecord(dbBank, DateTime.Now.Date);
+
+                if (newRecord != null) continue;
+
+                newRecord = new ExchangeRecord()
+                {
+                    Bank = dbBank,
+                    Date = DateTime.Now.Date,
+                    EUR = eur,
+                    USD = usd,
+                    RUR = rur
+                };
+
+                DatabaseManager.db.ExchangeRecords.Add(newRecord);  
             }
 
-
-
+            DatabaseManager.db.SaveChanges();
+            
         }
 
-        public static string getBankName(string bankId)
+        public static void setObmennikByBankId()
         {
-            int _bankId = int.Parse(bankId);
-
-            switch (_bankId)
-            {
-                case 1:  return "Абсолютбанк";
-                case 2:  return "Альфа-Банк";
-                case 3:  return "Банк ВТБ";
-                case 4:  return "Белагропромбанк";
-                case 5:  return "Белгазпромбанк";
-                case 6:  return "Белинвестбанк";
-                case 7:  return "Белорусский Банк Малого Бизнеса";
-                case 8:  return "Белорусский Народный Банк";
-                case 9:  return "БПС-Сбербанк";
-                case 10: return "Белросбанк";
-                case 11: return "БелСвиссБанк";
-                case 12: return "БТА Банк";
-                case 13: return "Евробанк";
-                case 14: return "Международный резервный банк";
-                case 15: return "МТБанк";
-                case 16: return "Паритетбанк";
-                case 17: return "Приорбанк";
-                case 18: return "Беларусбанк";
-                case 19: return "Идея Банк";
-                case 20: return "Технобанк";
-                case 21: return "Хоум Кредит Банк";
-                case 22: return "Цептер Банк";
-                case 23: return "Банк Москва-Минск";
-                case 24: return "Трастбанк";
-                case 25: return "БелВЭБ";
-                case 26: return "Франсабанк";
-                case 27: return "Дельта Банк";
-                case 28: return "РРБ-Банк";
-                case 29: return "Кредэксбанк";
-                case 30: return "ТК Банк";
-                case 31: return "Онербанк";
-                case 32: return "Бит-Банк";
-                case 34: return "Н.Е.Б. Банк";
-                default: throw new FormatException("Invalid bank Id");
+            //перенести в базу
+               obmennikByBankId.Add(1, "Абсолютбанк");
+               obmennikByBankId.Add(2, "Альфа-Банк");
+               obmennikByBankId.Add(3, "Банк ВТБ");
+               obmennikByBankId.Add(4, "Белагропромбанк");
+               obmennikByBankId.Add(5, "Белгазпромбанк");
+               obmennikByBankId.Add(6, "Белинвестбанк");
+               obmennikByBankId.Add(7, "Белорусский Банк Малого Бизнеса");
+               obmennikByBankId.Add(8, "Белорусский Народный Банк");
+               obmennikByBankId.Add(9, "БПС-Сбербанк");
+               obmennikByBankId.Add(10, "Белросбанк");
+               obmennikByBankId.Add(11, "БелСвиссБанк");
+               obmennikByBankId.Add(12, "БТА Банк");
+               obmennikByBankId.Add(13, "Евробанк");
+               obmennikByBankId.Add(14, "Международный резервный банк");
+               obmennikByBankId.Add(15, "МТБанк");
+               obmennikByBankId.Add(16, "Паритетбанк");
+               obmennikByBankId.Add(17, "Приорбанк");
+               obmennikByBankId.Add(18, "Беларусбанк");
+               obmennikByBankId.Add(19, "Идея Банк");
+               obmennikByBankId.Add(20, "Технобанк");
+               obmennikByBankId.Add(21, "Хоум Кредит Банк");
+               obmennikByBankId.Add(22, "Цептер Банк");
+               obmennikByBankId.Add(23, "Банк Москва-Минск");
+               obmennikByBankId.Add(24, "Трастбанк");
+               obmennikByBankId.Add(25, "БелВЭБ");
+               obmennikByBankId.Add(26, "Франсабанк");
+               obmennikByBankId.Add(27, "Дельта Банк");
+               obmennikByBankId.Add(28, "РРБ-Банк");
+               obmennikByBankId.Add(29, "Кредэксбанк");
+               obmennikByBankId.Add(30, "ТК Банк");
+               obmennikByBankId.Add(31, "Онербанк");
+               obmennikByBankId.Add(32, "Бит-Банк");
+               obmennikByBankId.Add(34, "Н.Е.Б. Банк");
             }
-        }
-
+        
         public static string createGoogleApiRequest(PointLatLng userPosition, int radius, string bankName)
         {
             return @"https://maps.googleapis.com/maps/api/place/radarsearch/json?location=" + userPosition.Lat + "," + userPosition.Lng +
@@ -179,26 +197,11 @@ namespace CurrencyExchange
 
         static void Main(string[] args)
         {
-            // DatabaseManager.getData();
-
-            List<string> banks = (from bank in DatabaseManager.db.Departments
-                                  select bank.Name).Distinct().ToList();
-
-            List<string> banksNames = new List<string>();
-
-            foreach(string bank in banks)
-            {
-                banksNames.Add(DatabaseManager.getBankName(bank));
-            }
-
-            banksNames = (from name in banksNames
-                          select name).Distinct().ToList();
-
-            foreach(string name in banksNames)
-            {
-                Console.WriteLine(name);
-            }
+            loadCurrencyData();
+            DatabaseManager.dataDump();
         }
+
+  
 
     }
 

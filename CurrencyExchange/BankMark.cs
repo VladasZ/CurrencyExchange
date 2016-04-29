@@ -10,7 +10,7 @@ namespace CurrencyExchange
     public class BankMark
     {
         public string Title { get; set; }
-        public PointLatLng location { get; set; }
+        public PointLatLng Location { get; set; }
         public int Sell { get; set; }
         public int Buy { get; set; }
     }

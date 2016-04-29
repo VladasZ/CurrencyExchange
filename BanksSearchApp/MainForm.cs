@@ -1,5 +1,6 @@
 ﻿using BanksSearchApp.Markers;
 using CurrencyExchange;
+using CurrencyExchange.Database;
 using GMap.NET;
 using GMap.NET.WindowsForms;
 using GMap.NET.WindowsForms.Markers;
@@ -24,6 +25,8 @@ namespace BanksSearchApp
             BanksOverlay
         }
 
+        PointLatLng somePlace;
+
 
         public GMapControl MapControl { get; } = new GMapControl();
         public PointLatLng UserLocation
@@ -43,6 +46,9 @@ namespace BanksSearchApp
         void MainForm_Load(object sender, EventArgs e)
         {
             SetMapParams();
+
+            searchRadiusTrackBar.Value = 1000;
+            searchRadiusLabel.Text = "1000";
         }
 
         void SetMapParams()
@@ -71,7 +77,6 @@ namespace BanksSearchApp
             MapControl.OnMapZoomChanged += ZoomChanged;
 
             scaleLabel.Text = "Масштаб: " + MapControl.Zoom.ToString();
-
         }
 
         private void ZoomChanged()
@@ -83,31 +88,34 @@ namespace BanksSearchApp
         {
             if(e.Button == MouseButtons.Left)
             {
-                // удаляем предыдущую метку
-                GMapOverlay prevUserLocation = getOverlay(OverlayType.UserLocationMarker);
+                setUserMark(sender, e);
 
-                if (prevUserLocation != null)
-                {
-                    MapControl.Overlays.Remove(prevUserLocation);
-                }
-
-
-                PointLatLng userLocation = MapControl.FromLocalToLatLng(e.X, e.Y);
-                Text = userLocation.ToString();
-
-                GMapOverlay markersOverlay = new GMapOverlay(OverlayType.UserLocationMarker.ToString());
-
-                GMarkerGoogle markerG = new GMarkerGoogle(userLocation, GMarkerGoogleType.red);
-
-                Text += markerG.Position.ToString();
-
-                markerG.ToolTip = new GMapRoundedToolTip(markerG);
-                markerG.ToolTipText = "Вы";
-                MapControl.Overlays.Add(markersOverlay);
-                markersOverlay.Markers.Add(markerG);
-
+                addMarks(DatabaseManager.getBankDepartmentsMarks(UserLocation, searchRadiusTrackBar.Value));
             }
 
+        }
+
+        void setUserMark(object sender, MouseEventArgs e)
+        {
+            // удаляем предыдущую метку
+            GMapOverlay prevUserLocation = getOverlay(OverlayType.UserLocationMarker);
+
+            if (prevUserLocation != null)
+            {
+                MapControl.Overlays.Remove(prevUserLocation);
+            }
+
+
+            PointLatLng userLocation = MapControl.FromLocalToLatLng(e.X, e.Y);
+
+            GMapOverlay markersOverlay = new GMapOverlay(OverlayType.UserLocationMarker.ToString());
+
+            GMarkerGoogle markerG = new GMarkerGoogle(userLocation, GMarkerGoogleType.red);
+
+            markerG.ToolTip = new GMapRoundedToolTip(markerG);
+            markerG.ToolTipText = "Вы";
+            MapControl.Overlays.Add(markersOverlay);
+            markersOverlay.Markers.Add(markerG);
         }
 
         void addMarks(List<BankMark> marks)
@@ -124,16 +132,15 @@ namespace BanksSearchApp
             GMapOverlay banksOverlay = new GMapOverlay(OverlayType.BanksOverlay.ToString());
             MapControl.Overlays.Add(banksOverlay);
 
-            //foreach (Result result in rootObject.results)
-            //{
-            //    GMarkerGoogle bankMarker = new GMarkerGoogle(result.Location, GMarkerGoogleType.arrow);
-            //    bankMarker.ToolTip = new GMapRoundedToolTip(bankMarker);
-            //    bankMarker.ToolTipText = result.name;
-            //    banksOverlay.Markers.Add(bankMarker);
+            foreach (BankMark mark in marks)
+            {
+                GMarkerGoogle bankMarker = new GMarkerGoogle(mark.Location, GMarkerGoogleType.arrow);
+                bankMarker.ToolTip = new GMapRoundedToolTip(bankMarker);
+                bankMarker.ToolTipText = mark.Title;
+                banksOverlay.Markers.Add(bankMarker);
+            }
 
-                
-            //}
-
+          //  somePlace = marks.Last().Location;
         }
 
 
@@ -143,6 +150,8 @@ namespace BanksSearchApp
                     where ov.Id == overlayType.ToString()
                     select ov).FirstOrDefault();
         }
+
+    
 
     }
        
