@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace CurrencyExchange
 {
-
+    //апишка сразу может выдавать полные данные о местах но только по 20 штук за раз
+    //этот класс это id мест которых можно получать по 200 штук за раз и потом из них получать данные
     public class PlaceIdRoot
     {
         public object[] html_attributions { get; set; }

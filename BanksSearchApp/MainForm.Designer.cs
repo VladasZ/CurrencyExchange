@@ -64,15 +64,16 @@
             this.searchRadiusTrackBar.TabIndex = 2;
             this.searchRadiusTrackBar.TickFrequency = 100;
             this.searchRadiusTrackBar.Value = 100;
+            this.searchRadiusTrackBar.Scroll += new System.EventHandler(this.searchRadiusTrackBar_Scroll);
             // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(452, 613);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(96, 13);
+            this.label1.Size = new System.Drawing.Size(82, 13);
             this.label1.TabIndex = 3;
-            this.label1.Text = "Радиус поиска м.";
+            this.label1.Text = "Радиус поиска";
             // 
             // searchRadiusLabel
             // 

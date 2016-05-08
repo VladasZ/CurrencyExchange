@@ -48,7 +48,7 @@ namespace BanksSearchApp
             SetMapParams();
 
             searchRadiusTrackBar.Value = 1000;
-            searchRadiusLabel.Text = "1000";
+            searchRadiusLabel.Text = "1000 м.";
         }
 
         void SetMapParams()
@@ -62,8 +62,8 @@ namespace BanksSearchApp
 
             MapControl.Bearing = 0;
             MapControl.MaxZoom = 18;
-            MapControl.MinZoom = 2;
-            MapControl.Zoom = 15;
+            MapControl.MinZoom = 12;
+            MapControl.Zoom = 12;
 
             MapControl.MouseWheelZoomType = MouseWheelZoomType.MousePositionAndCenter;
 
@@ -151,8 +151,11 @@ namespace BanksSearchApp
                     select ov).FirstOrDefault();
         }
 
-    
-
+        private void searchRadiusTrackBar_Scroll(object sender, EventArgs e)
+        {
+            searchRadiusLabel.Text = searchRadiusTrackBar.Value.ToString() + " м.";
+            addMarks(DatabaseManager.getBankDepartmentsMarks(UserLocation, searchRadiusTrackBar.Value));
+        }
     }
        
     }

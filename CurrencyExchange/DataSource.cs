@@ -25,8 +25,8 @@ namespace CurrencyExchange
 
         public static CurrencyDbContext DbContext { get; } = new CurrencyDbContext();
 
-        private static string CurrencySourceXMLPath = @"http://www.obmennik.by/xml/kurs.xml";
-        private static string GoogleAPIKey = @"AIzaSyDo_63nP_vhZS53MftWlqoIhJX7bTToPA0";
+        private static string CurrencySourceXMLPath = ConfigurationManager.AppSettings["CurrencySourceXMLPath"];
+        private static string GoogleAPIKey = ConfigurationManager.AppSettings["googleAPIKey"];
 
         //айдишники банков для сайта obmennik.by
         public static Dictionary<int, string> obmennikByBankId = new Dictionary<int, string>();
@@ -84,6 +84,7 @@ namespace CurrencyExchange
             
         }
 
+        //айдишники банков для сайта obmennik.by
         public static void setObmennikByBankId()
         {
             //перенести в базу
@@ -138,6 +139,7 @@ namespace CurrencyExchange
                     "&types=bank&key=" + GoogleAPIKey;
         }
 
+        // получаем гугловские id мест в указанной точке
         public static List<string> getPlacesID(PointLatLng userPosition, int radius)
         {
             string jsonData;
@@ -160,12 +162,12 @@ namespace CurrencyExchange
             return placesId;
         }
 
+        //получаем данные о месте по его гугловскому id
         public static PlaceInfo getPlaceInfo(string placeID)
         {
             string jsonData;
             string requestString = @"https://maps.googleapis.com/maps/api/place/details/json?placeid=" 
                                     + placeID + "&key=" + GoogleAPIKey;
-
 
             using (WebClient client = new WebClient())
             {
@@ -197,6 +199,7 @@ namespace CurrencyExchange
 
         static void Main(string[] args)
         {
+            DatabaseManager.getData();
             loadCurrencyData();
             DatabaseManager.dataDump();
         }

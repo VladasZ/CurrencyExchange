@@ -62,6 +62,8 @@ namespace CurrencyExchange.Database
 
             PlaceInfo departmentInfo = DataSource.getPlaceInfo(placeId);
 
+            if (departmentInfo.result == null) return;
+
             string bankName = getBankName(departmentInfo.result.name);
 
             //не добавляем в базу неизвестные нам банки
@@ -143,9 +145,7 @@ namespace CurrencyExchange.Database
                 {
                     Title = department.Bank.Name + "\n            Покупка Продажа\n" + 
                     "USD      " + record.USD.Buy + "     " + record.USD.Sell + "\n" +
-                    "EUR      " + record.EUR.Buy + "     " + record.EUR.Sell + "\n" +
-                    "RUR      " + record.RUR.Buy + "     " + record.RUR.Sell + "\n"
-
+                    "EUR      " + record.EUR.Buy + "     " + record.EUR.Sell + "\n"
                     ,
                     Location = new PointLatLng(department.LocationLat, department.LocationLng)
                 });
@@ -177,7 +177,7 @@ namespace CurrencyExchange.Database
                 Console.WriteLine(department.Name + " " + department.Bank.Name + " " + department.LocationLat);
 
             foreach(ExchangeRecord record in db.ExchangeRecords)
-                Console.WriteLine(record.Bank.Name + " " + record.USD.Buy);
+                Console.WriteLine(record.Bank.Name + " " + record.USD.Buy + " " + record.Date);
         }
 
         public static string getBankName(string departmentName)
