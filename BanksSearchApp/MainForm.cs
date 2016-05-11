@@ -25,9 +25,6 @@ namespace BanksSearchApp
             BanksOverlay
         }
 
-        PointLatLng somePlace;
-
-
         public GMapControl MapControl { get; } = new GMapControl();
         public PointLatLng UserLocation
         {

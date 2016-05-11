@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.button1 = new System.Windows.Forms.Button();
+            this.searchSettingsButton = new System.Windows.Forms.Button();
             this.scaleLabel = new System.Windows.Forms.Label();
             this.searchRadiusTrackBar = new System.Windows.Forms.TrackBar();
             this.label1 = new System.Windows.Forms.Label();
@@ -36,14 +36,15 @@
             ((System.ComponentModel.ISupportInitialize)(this.searchRadiusTrackBar)).BeginInit();
             this.SuspendLayout();
             // 
-            // button1
+            // searchSettingsButton
             // 
-            this.button1.Location = new System.Drawing.Point(12, 12);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
+            this.searchSettingsButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.searchSettingsButton.Location = new System.Drawing.Point(12, 12);
+            this.searchSettingsButton.Name = "searchSettingsButton";
+            this.searchSettingsButton.Size = new System.Drawing.Size(211, 53);
+            this.searchSettingsButton.TabIndex = 0;
+            this.searchSettingsButton.Text = "Критерии поиска";
+            this.searchSettingsButton.UseVisualStyleBackColor = true;
             // 
             // scaleLabel
             // 
@@ -93,7 +94,7 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.searchRadiusTrackBar);
             this.Controls.Add(this.scaleLabel);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.searchSettingsButton);
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Приложение";
@@ -106,7 +107,7 @@
 
         #endregion
 
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button searchSettingsButton;
         private System.Windows.Forms.Label scaleLabel;
         private System.Windows.Forms.TrackBar searchRadiusTrackBar;
         private System.Windows.Forms.Label label1;

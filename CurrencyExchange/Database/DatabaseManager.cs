@@ -13,11 +13,43 @@ namespace CurrencyExchange.Database
     {
         public static CurrencyDbContext db = new CurrencyDbContext();
 
+        public static Settings Settings { get; set; }
+
+        static DatabaseManager()
+        {
+            Settings = new Settings()
+            {
+                AllBanks = true,
+                Currency = db.Currencies.First()
+            };
+        }
+
+        public static void addCurrencies()
+        {
+            db.Currencies.Add(new Currency()
+            {
+                Code = "usd",
+                Name = "Доллар"
+            });
+
+            db.Currencies.Add(new Currency()
+            {
+                Code = "eur",
+                Name = "Евро"
+            });
+
+            //db.Currencies.Add(new Currency()
+            //{
+            //    Code = "rur",
+            //    Name = "Российский рубль"
+            //});
+        }
+
         public static void getData()
         {
             List<string> placesId = DataSource.getDefaultPlacesId();
 
-            Console.WriteLine(placesId.Count + " placesId count");
+            Console.WriteLine(placesId.Count + " banks found");
 
             //провереям есть ли такое отделение в нашей базе
             foreach(string placeId in placesId)
@@ -46,9 +78,8 @@ namespace CurrencyExchange.Database
                 };
 
                 db.Banks.Add(newBank);
+                db.SaveChanges();
             }
-
-            db.SaveChanges();
 
             return newBank;
         }
@@ -66,7 +97,7 @@ namespace CurrencyExchange.Database
 
             string bankName = getBankName(departmentInfo.result.name);
 
-            //не добавляем в базу неизвестные нам банки
+            //не добавляем в базу не известные нам банки
             if (bankName.Contains("unknown")) return;
 
             Bank bank = findBank(bankName);
@@ -111,21 +142,23 @@ namespace CurrencyExchange.Database
                     select bank).FirstOrDefault();
         }
 
-        public static ExchangeRecord findExchangeRecord(Bank bank, DateTime dateTime)
+        public static ExchangeRecord findExchangeRecord(Bank bank, Currency currency, DateTime dateTime)
         {
             if (db.ExchangeRecords.Count() == 0) return null;
 
-            ////обновляем базу валют если сегодня этого еще не было сделано
-            //DateTime today = DateTime.Now.Date;
-
-            //if(db.ExchangeRecords.FirstOrDefault(rec => rec.Date == today) == null)
-            //{
-            //    DataSource.loadCurrencyData();
-            //}
-
-            return (from record in db.ExchangeRecords.Include("Bank")
-                    where record.Bank.Id == bank.Id && record.Date == dateTime
+            return (from record in db.ExchangeRecords.Include("Bank").Include("CurrencyType")
+                    where record.Bank.Id == bank.Id && record.Date == dateTime && record.CurrencyType.Id == currency.Id
                     select record).FirstOrDefault();
+        }
+
+        //проверяем актуальность курсов валют, пытаемся найти любую запись с сегодяшней датой
+        public static bool currenciesExchangeIsRelevant()
+        {
+            ExchangeRecord checkRecord = findExchangeRecord(db.Banks.First(), db.Currencies.First(), DateTime.Now);
+
+            if (checkRecord == null) return false;
+
+            return true;
         }
         
         public static List<BankMark> getBankDepartmentsMarks(PointLatLng userLocation, int radius)
@@ -133,26 +166,26 @@ namespace CurrencyExchange.Database
             List<BankMark> marks = new List<BankMark>();
 
 
-            foreach(BankDepartment department in db.Departments.Include("Bank"))
+            foreach (BankDepartment department in db.Departments.Include("Bank"))
             {
                 if (distance(department.getPointLatLng(), userLocation) > radius) continue;
 
-                ExchangeRecord record = findExchangeRecord(department.Bank, DateTime.Now.Date);
+                ExchangeRecord record = findExchangeRecord(department.Bank, Settings.Currency, DateTime.Now.Date);
 
                 if (record == null) continue;
 
                 marks.Add(new BankMark()
                 {
-                    Title = department.Bank.Name + "\n            Покупка Продажа\n" + 
-                    "USD      " + record.USD.Buy + "     " + record.USD.Sell + "\n" +
-                    "EUR      " + record.EUR.Buy + "     " + record.EUR.Sell + "\n"
-                    ,
+                    Title = department.Bank.Name + "\n            Покупка Продажа\n" +
+                    record.CurrencyType.Code.ToUpper() + "      " + record.Buy + "     " + record.Sell + "\n",
                     Location = new PointLatLng(department.LocationLat, department.LocationLng)
                 });
             }
 
             return marks;
         }
+
+        
 
         public static void eraseDatabase()
         {
@@ -164,6 +197,9 @@ namespace CurrencyExchange.Database
 
             foreach (ExchangeRecord record in db.ExchangeRecords)
                 db.ExchangeRecords.Remove(record);
+
+            foreach (Currency currency in db.Currencies)
+                db.Currencies.Remove(currency);
 
             db.SaveChanges();
         }
@@ -177,7 +213,10 @@ namespace CurrencyExchange.Database
                 Console.WriteLine(department.Name + " " + department.Bank.Name + " " + department.LocationLat);
 
             foreach(ExchangeRecord record in db.ExchangeRecords)
-                Console.WriteLine(record.Bank.Name + " " + record.USD.Buy + " " + record.Date);
+                Console.WriteLine(record.Bank.Name + " " + record.Buy + " " + record.Date);
+
+            foreach(Currency currency in db.Currencies)
+                Console.WriteLine("cur" + currency.Name);
         }
 
         public static string getBankName(string departmentName)

@@ -31,8 +31,12 @@ namespace CurrencyExchange
         //айдишники банков для сайта obmennik.by
         public static Dictionary<int, string> obmennikByBankId = new Dictionary<int, string>();
 
+
         public static void loadCurrencyData()
         {
+            if (DatabaseManager.currenciesExchangeIsRelevant()) return;
+
+
             //данные о курсах достаю в ручную потому что мне не понравилась структура с сайта
             XDocument doc = XDocument.Load(CurrencySourceXMLPath);
 
@@ -46,38 +50,18 @@ namespace CurrencyExchange
 
                 if (dbBank == null) continue;
 
-                Currency usd = new Currency()
+                foreach (Currency currency in DatabaseManager.db.Currencies)
                 {
-                    Buy = double.Parse(bank.Element("usd").Element("buy").Value),
-                    Sell = double.Parse(bank.Element("usd").Element("sell").Value)
-                };
+                    DatabaseManager.db.ExchangeRecords.Add(new ExchangeRecord()
+                    {
+                        Bank = dbBank,
+                        CurrencyType = currency,
+                        Date = DateTime.Now.Date,
+                        Buy = double.Parse(bank.Element(currency.Code).Element("buy").Value),
+                        Sell = double.Parse(bank.Element(currency.Code).Element("sell").Value),
+                    });
+                }
 
-                Currency eur = new Currency()
-                {
-                    Buy = double.Parse(bank.Element("eur").Element("buy").Value),
-                    Sell = double.Parse(bank.Element("eur").Element("sell").Value)
-                };
-
-                Currency rur = new Currency()
-                {
-                    Buy = 5,//double.Parse(bank.Element("rur").Element("buy").Value, NumberStyles.AllowDecimalPoint),
-                    Sell = 5//double.Parse(bank.Element("rur").Element("sell").Value, NumberStyles.AllowDecimalPoint)
-                };
-
-                ExchangeRecord newRecord = DatabaseManager.findExchangeRecord(dbBank, DateTime.Now.Date);
-
-                if (newRecord != null) continue;
-
-                newRecord = new ExchangeRecord()
-                {
-                    Bank = dbBank,
-                    Date = DateTime.Now.Date,
-                    EUR = eur,
-                    USD = usd,
-                    RUR = rur
-                };
-
-                DatabaseManager.db.ExchangeRecords.Add(newRecord);  
             }
 
             DatabaseManager.db.SaveChanges();
@@ -192,6 +176,7 @@ namespace CurrencyExchange
             return placesInfo;
         }
 
+        //собираем данные из Минска
         public static List<string> getDefaultPlacesId()
         {
             return getPlacesID(new PointLatLng(53.9017, 27.56227), 50000);
@@ -199,8 +184,10 @@ namespace CurrencyExchange
 
         static void Main(string[] args)
         {
-            DatabaseManager.getData();
-            loadCurrencyData();
+            //DatabaseManager.eraseDatabase();
+            //DatabaseManager.addCurrencies();
+            //DatabaseManager.getData();
+            //loadCurrencyData();
             DatabaseManager.dataDump();
         }
 

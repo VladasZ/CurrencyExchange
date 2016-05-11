@@ -11,8 +11,8 @@ namespace CurrencyExchange.Entities
         public int Id { get; set; }
         public DateTime Date { get; set; }
         public Bank Bank { get; set; }
-        public Currency USD { get; set; }
-        public Currency EUR { get; set; }
-        public Currency RUR { get; set; }
+        public Currency CurrencyType { get; set; }
+        public double Buy { get; set; }
+        public double Sell { get; set; }
     }
 }

@@ -8,7 +8,8 @@ namespace CurrencyExchange.Entities
 {
     public class Currency
     {
-        public double Sell { get; set; }
-        public double Buy { get; set; }
+        public int Id { get; set; }
+        public string Code { get; set; }
+        public string Name { get; set; }
     }
 }
