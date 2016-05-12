@@ -1,6 +1,6 @@
 ﻿namespace BanksSearchApp
 {
-    partial class searchSettingsForm
+    partial class SearchSettingsForm
     {
         /// <summary>
         /// Required designer variable.
@@ -29,10 +29,12 @@
         private void InitializeComponent()
         {
             this.label2 = new System.Windows.Forms.Label();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.profitComboBox = new System.Windows.Forms.ComboBox();
             this.showAllBanksCheckBox = new System.Windows.Forms.CheckBox();
-            this.comboBox2 = new System.Windows.Forms.ComboBox();
-            this.comboBox3 = new System.Windows.Forms.ComboBox();
+            this.sellComboBox = new System.Windows.Forms.ComboBox();
+            this.currencyComboBox = new System.Windows.Forms.ComboBox();
+            this.cancelButton = new System.Windows.Forms.Button();
+            this.okButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label2
@@ -44,16 +46,17 @@
             this.label2.TabIndex = 1;
             this.label2.Text = "Я хочу";
             // 
-            // comboBox1
+            // profitComboBox
             // 
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Items.AddRange(new object[] {
+            this.profitComboBox.Enabled = false;
+            this.profitComboBox.FormattingEnabled = true;
+            this.profitComboBox.Items.AddRange(new object[] {
             "Купить",
             "Продать"});
-            this.comboBox1.Location = new System.Drawing.Point(128, 43);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(82, 21);
-            this.comboBox1.TabIndex = 2;
+            this.profitComboBox.Location = new System.Drawing.Point(161, 43);
+            this.profitComboBox.Name = "profitComboBox";
+            this.profitComboBox.Size = new System.Drawing.Size(82, 21);
+            this.profitComboBox.TabIndex = 2;
             // 
             // showAllBanksCheckBox
             // 
@@ -66,38 +69,63 @@
             this.showAllBanksCheckBox.TabIndex = 4;
             this.showAllBanksCheckBox.Text = "Показывать все банки";
             this.showAllBanksCheckBox.UseVisualStyleBackColor = true;
+            this.showAllBanksCheckBox.CheckedChanged += new System.EventHandler(this.showAllBanksCheckBox_CheckedChanged);
             // 
-            // comboBox2
+            // sellComboBox
             // 
-            this.comboBox2.FormattingEnabled = true;
-            this.comboBox2.Items.AddRange(new object[] {
+            this.sellComboBox.Enabled = false;
+            this.sellComboBox.FormattingEnabled = true;
+            this.sellComboBox.Items.AddRange(new object[] {
             "Выгодно",
             "Не выгодно"});
-            this.comboBox2.Location = new System.Drawing.Point(57, 43);
-            this.comboBox2.Name = "comboBox2";
-            this.comboBox2.Size = new System.Drawing.Size(65, 21);
-            this.comboBox2.TabIndex = 5;
+            this.sellComboBox.Location = new System.Drawing.Point(57, 43);
+            this.sellComboBox.Name = "sellComboBox";
+            this.sellComboBox.Size = new System.Drawing.Size(98, 21);
+            this.sellComboBox.TabIndex = 5;
             // 
-            // comboBox3
+            // currencyComboBox
             // 
-            this.comboBox3.FormattingEnabled = true;
-            this.comboBox3.Location = new System.Drawing.Point(227, 43);
-            this.comboBox3.Name = "comboBox3";
-            this.comboBox3.Size = new System.Drawing.Size(121, 21);
-            this.comboBox3.TabIndex = 6;
+            this.currencyComboBox.Enabled = false;
+            this.currencyComboBox.FormattingEnabled = true;
+            this.currencyComboBox.Location = new System.Drawing.Point(249, 43);
+            this.currencyComboBox.Name = "currencyComboBox";
+            this.currencyComboBox.Size = new System.Drawing.Size(92, 21);
+            this.currencyComboBox.TabIndex = 6;
             // 
-            // searchSettingsForm
+            // cancelButton
+            // 
+            this.cancelButton.Location = new System.Drawing.Point(185, 70);
+            this.cancelButton.Name = "cancelButton";
+            this.cancelButton.Size = new System.Drawing.Size(75, 23);
+            this.cancelButton.TabIndex = 7;
+            this.cancelButton.Text = "Отмена";
+            this.cancelButton.UseVisualStyleBackColor = true;
+            this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
+            // 
+            // okButton
+            // 
+            this.okButton.Location = new System.Drawing.Point(266, 70);
+            this.okButton.Name = "okButton";
+            this.okButton.Size = new System.Drawing.Size(75, 23);
+            this.okButton.TabIndex = 8;
+            this.okButton.Text = "ОК";
+            this.okButton.UseVisualStyleBackColor = true;
+            this.okButton.Click += new System.EventHandler(this.okButton_Click);
+            // 
+            // SearchSettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(393, 89);
-            this.Controls.Add(this.comboBox3);
-            this.Controls.Add(this.comboBox2);
+            this.ClientSize = new System.Drawing.Size(351, 101);
+            this.Controls.Add(this.okButton);
+            this.Controls.Add(this.cancelButton);
+            this.Controls.Add(this.currencyComboBox);
+            this.Controls.Add(this.sellComboBox);
             this.Controls.Add(this.showAllBanksCheckBox);
-            this.Controls.Add(this.comboBox1);
+            this.Controls.Add(this.profitComboBox);
             this.Controls.Add(this.label2);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.Name = "searchSettingsForm";
+            this.Name = "SearchSettingsForm";
             this.Text = "Критерии поиска";
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -107,9 +135,11 @@
         #endregion
 
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.ComboBox profitComboBox;
         private System.Windows.Forms.CheckBox showAllBanksCheckBox;
-        private System.Windows.Forms.ComboBox comboBox2;
-        private System.Windows.Forms.ComboBox comboBox3;
+        private System.Windows.Forms.ComboBox sellComboBox;
+        private System.Windows.Forms.ComboBox currencyComboBox;
+        private System.Windows.Forms.Button cancelButton;
+        private System.Windows.Forms.Button okButton;
     }
 }

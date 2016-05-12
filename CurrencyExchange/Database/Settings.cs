@@ -11,6 +11,7 @@ namespace CurrencyExchange.Database
     {
         public bool AllBanks { get; set; }
         public bool Profitable { get; set; }
+        public bool Sell { get; set; }
         public Currency Currency { get; set; }
     }
 }

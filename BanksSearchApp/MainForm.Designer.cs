@@ -45,6 +45,7 @@
             this.searchSettingsButton.TabIndex = 0;
             this.searchSettingsButton.Text = "Критерии поиска";
             this.searchSettingsButton.UseVisualStyleBackColor = true;
+            this.searchSettingsButton.Click += new System.EventHandler(this.searchSettingsButton_Click);
             // 
             // scaleLabel
             // 

@@ -165,8 +165,22 @@ namespace CurrencyExchange.Database
         {
             List<BankMark> marks = new List<BankMark>();
 
+            List<BankDepartment> requestedDepartments;
 
-            foreach (BankDepartment department in db.Departments.Include("Bank"))
+            if (Settings.AllBanks)
+            {
+                requestedDepartments = db.Departments.Include("Bank").ToList();
+            }
+            else
+            {
+                Bank requestedBank = findRequestedBank();
+
+                requestedDepartments = (from dep in db.Departments.Include("Bank")
+                                        where dep.Bank.Id == requestedBank.Id
+                                        select dep).ToList();
+            }
+
+            foreach (BankDepartment department in requestedDepartments)
             {
                 if (distance(department.getPointLatLng(), userLocation) > radius) continue;
 
@@ -185,6 +199,23 @@ namespace CurrencyExchange.Database
             return marks;
         }
 
+        //ищем подходящий нам банк в соответствии с настройками
+        private static Bank findRequestedBank()
+        {
+            List<ExchangeRecord> requestedCurrencyRecords = (from rec in db.ExchangeRecords.Include("Bank")
+                                                             where rec.CurrencyType.Id == Settings.Currency.Id
+                                                             select rec).ToList();
+
+            ExchangeRecord requestedRecord = (from rec in requestedCurrencyRecords
+                                              where Settings.Profitable ?
+                                                    rec.Buy == requestedCurrencyRecords.Max(r => r.Buy) :
+                                                    rec.Sell == requestedCurrencyRecords.Min(r => r.Sell)
+                                                    &&
+                                                    rec.CurrencyType.Id == Settings.Currency.Id
+                                              select rec).FirstOrDefault();
+
+            return requestedRecord.Bank;
+        }
         
 
         public static void eraseDatabase()
@@ -219,6 +250,7 @@ namespace CurrencyExchange.Database
                 Console.WriteLine("cur" + currency.Name);
         }
 
+        //нужно только для первоначальной загрузки данных в базу и отбрасывания неизветных банков
         public static string getBankName(string departmentName)
         {
             if (departmentName.Contains("Idea") || 
@@ -310,7 +342,13 @@ namespace CurrencyExchange.Database
             return departmentName + " #unknown";
         }
 
-        //google
+        public static List<string> getCurrenciesName()
+        {
+            return (from currency in db.Currencies
+                    select currency.Name).ToList();
+        }
+        
+        //stackoverflow
         public static int distance(PointLatLng point1, PointLatLng point2)
         {
             double R = 6371; // km

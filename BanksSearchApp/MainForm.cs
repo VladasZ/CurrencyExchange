@@ -153,6 +153,13 @@ namespace BanksSearchApp
             searchRadiusLabel.Text = searchRadiusTrackBar.Value.ToString() + " м.";
             addMarks(DatabaseManager.getBankDepartmentsMarks(UserLocation, searchRadiusTrackBar.Value));
         }
+
+        private void searchSettingsButton_Click(object sender, EventArgs e)
+        {
+            SearchSettingsForm form = new SearchSettingsForm();
+
+            form.ShowDialog();
+        }
     }
        
     }
