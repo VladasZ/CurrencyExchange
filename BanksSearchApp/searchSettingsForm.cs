@@ -21,24 +21,22 @@ namespace BanksSearchApp
 
             currencyComboBox.DataSource = DatabaseManager.getCurrenciesName();
 
-            sellComboBox.SelectedIndex = 0;
-            profitComboBox.SelectedIndex = 0;
-            currencyComboBox.SelectedIndex = 0;
+            showAllBanksCheckBox.Checked = DatabaseManager.Settings.AllBanks;
+            profitComboBox.SelectedIndex = DatabaseManager.Settings.Profitable ? 0 : 1;
+            sellComboBox.SelectedIndex = DatabaseManager.Settings.Sell ? 1 : 0;
+            currencyComboBox.SelectedIndex = DatabaseManager.Settings.Currency.Id - DatabaseManager.db.Currencies.First().Id;
         }
 
         private void showAllBanksCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             if (showAllBanksCheckBox.Checked)
             {
-                sellComboBox.Enabled = false;
                 profitComboBox.Enabled = false;
-                currencyComboBox.Enabled = false;
+
             }
             else
             {
-                sellComboBox.Enabled = true;
                 profitComboBox.Enabled = true;
-                currencyComboBox.Enabled = true;
             }
         }
 
@@ -53,7 +51,7 @@ namespace BanksSearchApp
             {
                 AllBanks = showAllBanksCheckBox.Checked,
                 Profitable = profitComboBox.SelectedIndex == 0 ? true : false,
-                Sell = sellComboBox.SelectedIndex == 0 ? true : false,
+                Sell = sellComboBox.SelectedIndex == 0 ? false : true,
                 Currency = (from cur in DatabaseManager.db.Currencies
                             where cur.Name == currencyComboBox.Text
                             select cur).FirstOrDefault()

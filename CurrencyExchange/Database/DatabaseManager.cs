@@ -20,10 +20,13 @@ namespace CurrencyExchange.Database
             Settings = new Settings()
             {
                 AllBanks = true,
-                Currency = db.Currencies.First()
+                Profitable = true,
+                Sell = false,
+                Currency = db.Currencies.FirstOrDefault()
             };
         }
 
+        //добавляем поддерживаемые валюты
         public static void addCurrencies()
         {
             db.Currencies.Add(new Currency()
@@ -38,11 +41,11 @@ namespace CurrencyExchange.Database
                 Name = "Евро"
             });
 
-            //db.Currencies.Add(new Currency()
-            //{
-            //    Code = "rur",
-            //    Name = "Российский рубль"
-            //});
+            db.Currencies.Add(new Currency()
+            {
+                Code = "rur",
+                Name = "Российский рубль"
+            });
         }
 
         public static void getData()
@@ -154,7 +157,7 @@ namespace CurrencyExchange.Database
         //проверяем актуальность курсов валют, пытаемся найти любую запись с сегодяшней датой
         public static bool currenciesExchangeIsRelevant()
         {
-            ExchangeRecord checkRecord = findExchangeRecord(db.Banks.First(), db.Currencies.First(), DateTime.Now);
+            ExchangeRecord checkRecord = findExchangeRecord(db.Banks.FirstOrDefault(), db.Currencies.FirstOrDefault(), DateTime.Now);
 
             if (checkRecord == null) return false;
 
@@ -190,8 +193,8 @@ namespace CurrencyExchange.Database
 
                 marks.Add(new BankMark()
                 {
-                    Title = department.Bank.Name + "\n            Покупка Продажа\n" +
-                    record.CurrencyType.Code.ToUpper() + "      " + record.Buy + "     " + record.Sell + "\n",
+                    Title = department.Bank.Name + "\n" + (Settings.Sell ? "Продажа" : "Покупка") + "\n" +
+                    record.CurrencyType.Code.ToUpper() + "      " + (Settings.Sell ? record.Buy : record.Sell) + "\n",
                     Location = new PointLatLng(department.LocationLat, department.LocationLng)
                 });
             }
@@ -206,10 +209,22 @@ namespace CurrencyExchange.Database
                                                              where rec.CurrencyType.Id == Settings.Currency.Id
                                                              select rec).ToList();
 
+
             ExchangeRecord requestedRecord = (from rec in requestedCurrencyRecords
                                               where Settings.Profitable ?
-                                                    rec.Buy == requestedCurrencyRecords.Max(r => r.Buy) :
-                                                    rec.Sell == requestedCurrencyRecords.Min(r => r.Sell)
+                                                                (
+                                                                Settings.Sell ?
+                                                                rec.Sell == requestedCurrencyRecords.Min(r => r.Sell) 
+                                                                              :
+                                                                rec.Buy == requestedCurrencyRecords.Max(r => r.Buy)
+                                                                )
+                                                                        :
+                                                                (
+                                                                Settings.Sell ?
+                                                                rec.Sell == requestedCurrencyRecords.Max(r => r.Sell)
+                                                                              :
+                                                                rec.Buy == requestedCurrencyRecords.Min(r => r.Buy)
+                                                                )
                                                     &&
                                                     rec.CurrencyType.Id == Settings.Currency.Id
                                               select rec).FirstOrDefault();

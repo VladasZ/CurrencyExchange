@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace CurrencyExchange
 {
+    //класс передающий информацию для карты
     public class BankMark
     {
         public string Title { get; set; }

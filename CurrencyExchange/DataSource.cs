@@ -52,13 +52,14 @@ namespace CurrencyExchange
 
                 foreach (Currency currency in DatabaseManager.db.Currencies)
                 {
+                    
                     DatabaseManager.db.ExchangeRecords.Add(new ExchangeRecord()
                     {
                         Bank = dbBank,
                         CurrencyType = currency,
                         Date = DateTime.Now.Date,
-                        Buy = double.Parse(bank.Element(currency.Code).Element("buy").Value),
-                        Sell = double.Parse(bank.Element(currency.Code).Element("sell").Value),
+                        Buy = double.Parse(bank.Element(currency.Code).Element("buy").Value, CultureInfo.GetCultureInfo("en-GB")),
+                        Sell = double.Parse(bank.Element(currency.Code).Element("sell").Value, CultureInfo.GetCultureInfo("en-GB")),
                     });
                 }
 
@@ -185,9 +186,9 @@ namespace CurrencyExchange
         static void Main(string[] args)
         {
             //DatabaseManager.eraseDatabase();
-            //DatabaseManager.addCurrencies();
-            //DatabaseManager.getData();
-            //loadCurrencyData();
+            DatabaseManager.addCurrencies();
+            DatabaseManager.getData();
+            loadCurrencyData();
             DatabaseManager.dataDump();
         }
 

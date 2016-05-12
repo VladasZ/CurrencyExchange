@@ -46,6 +46,11 @@ namespace BanksSearchApp
 
             searchRadiusTrackBar.Value = 1000;
             searchRadiusLabel.Text = "1000 м.";
+
+            DataSource.loadCurrencyData();
+
+            //кликаем в центр экрана для стартового маркера
+             mapClick(null, new MouseEventArgs(MouseButtons.Left, 1, Width / 2, Height / 2, 0));
         }
 
         void SetMapParams()
@@ -60,7 +65,7 @@ namespace BanksSearchApp
             MapControl.Bearing = 0;
             MapControl.MaxZoom = 18;
             MapControl.MinZoom = 12;
-            MapControl.Zoom = 12;
+            MapControl.Zoom = 14;
 
             MapControl.MouseWheelZoomType = MouseWheelZoomType.MousePositionAndCenter;
 
@@ -159,6 +164,11 @@ namespace BanksSearchApp
             SearchSettingsForm form = new SearchSettingsForm();
 
             form.ShowDialog();
+
+            if (form.DialogResult == DialogResult.OK)
+            {
+                mapClick(null, new MouseEventArgs(MouseButtons.Left, 1, Width / 2, Height / 2, 0));
+            }
         }
     }
        
